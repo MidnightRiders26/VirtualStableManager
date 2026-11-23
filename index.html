@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Virtual Stable Manager</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bilbo+Swash+Caps&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style id="market-profile-overrides">
+#profile-market .market-suggestion-grid {
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:14px;
+    margin:18px 0 24px;
+}
+#profile-market .market-suggestion-card {
+    display:flex;
+    flex-direction:column;
+    gap:9px;
+    min-width:0;
+    padding:18px;
+    border:1px solid #e6ddeb;
+    border-radius:12px;
+    background:#fff;
+}
+#profile-market .market-suggestion-card.featured {
+    border-color:#b9a4c8;
+    background:#fbf8fd;
+}
+#profile-market .market-suggestion-card span {
+    font-size:13px;
+    color:#74697c;
+    font-weight:600;
+}
+#profile-market .market-suggestion-card strong {
+    font-size:25px;
+    color:#45384d;
+}
+#profile-market .market-suggestion-card small {
+    font-size:12px;
+    color:#817687;
+    line-height:1.5;
+}
+#profile-market .market-evaluation-details {
+    border-top:1px solid #eee7f0;
+    padding-top:16px;
+}
+#profile-market .market-evaluation-details ul {
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px 24px;
+    padding-left:20px;
+}
+#profile-market .market-evaluation-details p {
+    font-size:13px;
+    color:#817687;
+    line-height:1.6;
+}
+@media(max-width:700px) {
+    #profile-market .market-suggestion-grid,
+    #profile-market .market-evaluation-details ul {
+        grid-template-columns:1fr;
+    }
+}
+</style>
+</head>
+<body>
+<div class="app-shell">
+<aside class="sidebar">
+<div class="brand">
+<div class="brand-name">Virtual Stable</div>
+<div class="brand-name">Manager</div>
+<p>YOUR HORSES. YOUR LEGACY.</p>
+</div>
+<nav class="main-nav">
+<span class="nav-label">MAIN MENU</span>
+<button class="nav-item active" data-page="dashboard"><span>⌂</span> Dashboard</button>
+<button class="nav-item" data-page="horses"><span>♞</span> Horse Registry</button>
+<button class="nav-item" data-page="pedigree"><span>◇</span> Pedigree &amp; Genetics</button>
+<button class="nav-item" data-page="breeding"><span>♡</span> Breeding Management</button>
+<button class="nav-item" data-page="offspring"><span>♧</span> Offspring Records</button>
+<button class="nav-item" data-page="performance"><span>✧</span> Performance</button>
+<button class="nav-item" data-page="market"><span>⌁</span> Market &amp; Pricing</button>
+<button class="nav-item" data-page="statistics"><span>▥</span> Statistics</button>
+<span class="nav-label settings-label">PREFERENCES</span>
+<button class="nav-item" data-page="settings"><span>⚙</span> Settings</button>
+</nav>
+<div class="sidebar-footer">
+<span>VIRTUAL STABLE MANAGER</span>
+<strong>V1.0</strong>
+<small>Private Development</small>
+</div>
+</aside>
+
+<main class="main-content">
+<header class="topbar">
+<div>
+<p class="breadcrumb">Virtual Stable Manager / <span id="breadcrumb-current">Dashboard</span></p>
+<h1 id="page-title">Dashboard</h1>
+</div>
+<div class="topbar-right">
+<span class="version-label">V1.0</span>
+<span id="current-date"></span>
+</div>
+</header>
+
+<!-- DASHBOARD -->
+<section class="page active" id="dashboard-page">
+<div class="welcome-section">
+<div>
+<h2>Welcome to Your Stable</h2>
+<p>Your horses, their bloodlines, and their history — all in one place.</p>
+</div>
+</div>
+<div class="stats-grid">
+<div class="stat-card">
+<span class="stat-icon">♞</span>
+<p>Total Horses</p>
+<strong id="dashboard-total-horses">0</strong>
+<small>All recorded horses</small>
+</div>
+<div class="stat-card">
+<span class="stat-icon">♡</span>
+<p>Active Herd</p>
+<strong id="dashboard-active-horses">0</strong>
+<small>Currently in your stable</small>
+</div>
+<div class="stat-card">
+<span class="stat-icon">♧</span>
+<p>Total Foals</p>
+<strong>0</strong>
+<small>Registered offspring</small>
+</div>
+<div class="stat-card">
+<span class="stat-icon">✧</span>
+<p>Horses for Sale</p>
+<strong id="dashboard-for-sale-horses">0</strong>
+<small>Currently listed for sale</small>
+</div>
+</div>
+<div class="panel">
+<div class="panel-heading">
+<div><h3>Stable Overview</h3><p>Application activity</p></div>
+</div>
+<div class="overview-list">
+<div><span>Sold Horses</span><strong>0</strong></div>
+<div><span>Retired Horses</span><strong>0</strong></div>
+<div><span>Deceased Horses</span><strong>0</strong></div>
+<div><span>Breeding Records</span><strong>0</strong></div>
+</div>
+</div>
+</section>
+
+<!-- HORSE REGISTRY -->
+<section class="page" id="horses-page">
+<div class="registry-intro">
+<div>
+<h2>Your Horse Registry</h2>
+<p>Manage and explore your horses and their permanent records.</p>
+</div>
+<button class="profile-preview-button" type="button" data-navigate="add-horse">+ Add Horse</button>
+</div>
+<div class="registry-stats">
+<div class="registry-stat"><span>Active Herd</span><strong id="registry-active-count">0</strong></div>
+<div class="registry-stat"><span>Sold Horses</span><strong>0</strong></div>
+<div class="registry-stat"><span>Retired Horses</span><strong>0</strong></div>
+<div class="registry-stat"><span>Deceased Horses</span><strong>0</strong></div>
+</div>
+<div class="registry-tabs">
+<button class="registry-tab active" type="button" data-registry="active">Active Herd</button>
+<button class="registry-tab" type="button" data-registry="sold">Sold Horses</button>
+<button class="registry-tab" type="button" data-registry="retired">Retired Horses</button>
+<button class="registry-tab" type="button" data-registry="deceased">Deceased Horses</button>
+</div>
+<div class="registry-toolbar">
+<div class="search-wrapper">
+<span>⌕</span>
+<input type="search" id="horse-search" placeholder="Search horses...">
+</div>
+<select id="breed-filter" aria-label="Filter by breed">
+<option value="all">All Breeds</option>
+<option value="appaloosa">Appaloosa</option>
+<option value="arabian">Arabian</option>
+<option value="quarter-horse">Quarter Horse</option>
+<option value="icelandic">Icelandic</option>
+<option value="other">Other Breeds</option>
+</select>
+<select id="sort-horses" aria-label="Sort horses">
+<option value="name">Sort: Name</option>
+<option value="breed">Sort: Breed</option>
+<option value="age">Sort: Age</option>
+<option value="gp">Sort: GP</option>
+</select>
+</div>
+<div class="registry-content" id="horse-list">
+<div class="registry-empty-state">
+<div class="registry-empty-icon">♞</div>
+<h3>Your Active Herd Awaits</h3>
+<p>Your active horse records will appear here once horses have been added to VSM.</p>
+</div>
+</div>
+</section>
+<!-- ADD / EDIT HORSE -->
+<section class="page" id="add-horse-page">
+<div class="registry-intro">
+<div>
+<h2 id="horse-form-title">Add a Horse</h2>
+<p id="horse-form-description">Enter your horse's information to create a permanent record.</p>
+</div>
+</div>
+<form id="add-horse-form" class="horse-form">
+<div class="profile-panel-heading">
+<div><h3>Basic Information</h3><p>Horse identity and registration details</p></div>
+</div>
+<div class="profile-detail-grid">
+<label class="form-field"><span>Registered Name *</span><input type="text" name="name" required></label>
+<label class="form-field"><span>Breed *</span><input type="text" name="breed" required></label>
+<label class="form-field"><span>Sex *</span>
+<select name="sex" required>
+<option value="">Select sex</option>
+<option value="Mare">Mare</option>
+<option value="Stallion">Stallion</option>
+<option value="Gelding">Gelding</option>
+<option value="Filly">Filly</option>
+<option value="Colt">Colt</option>
+<option value="Foal">Foal</option>
+</select>
+</label>
+<label class="form-field"><span>Horse Reality ID</span><input type="text" name="hrId"></label>
+<label class="form-field"><span>Date of Birth</span><input type="date" name="dob"></label>
+<label class="form-field"><span>COI</span><input type="text" name="coi" placeholder="Example: 2.45%"></label>
+</div>
+<div class="sale-listing-option">
+<label class="sale-listing-checkbox">
+<input type="checkbox" name="listedForSale" value="true">
+<span><strong>Listed for Sale</strong><small>Mark this horse as currently available for sale.</small></span>
+</label>
+</div>
+
+<div class="profile-panel-heading">
+<div><h3>Color &amp; Appaloosa Genetics</h3><p>Select the complete genotype for each gene</p></div>
+</div>
+<div class="genetics-group">
+<h4>Colours &amp; Modifiers</h4>
+<div class="form-grid">
+<label class="form-field"><span>Extension</span>
+<select name="geneExtension">
+<option value="">Not entered</option><option value="E/E">E/E</option><option value="E/e">E/e</option><option value="e/e">e/e</option>
+</select></label>
+<label class="form-field"><span>Agouti</span>
+<select name="geneAgouti">
+<option value="">Not entered</option><option value="A/A">A/A</option><option value="A/At">A/At</option><option value="A/a">A/a</option><option value="At/At">At/At</option><option value="At/a">At/a</option><option value="a/a">a/a</option>
+</select></label>
+<label class="form-field"><span>Grey</span>
+<select name="geneGrey">
+<option value="">Not entered</option><option value="G/G">G/G</option><option value="G/g">G/g</option><option value="g/g">g/g</option>
+</select></label>
+</div>
+</div>
+<div class="genetics-group">
+<h4>Dilutions</h4>
+<div class="form-grid">
+<label class="form-field"><span>Cream / Pearl</span>
+<select name="geneCreamPearl">
+<option value="">Not entered</option><option value="CR/CR">CR/CR</option><option value="CR/prl">CR/prl</option><option value="CR/n">CR/n</option><option value="prl/prl">prl/prl</option><option value="prl/n">prl/n</option><option value="n/n">n/n</option>
+</select></label>
+<label class="form-field"><span>Dun</span>
+<select name="geneDun">
+<option value="">Not entered</option><option value="D/D">D/D</option><option value="D/nd1">D/nd1</option><option value="D/nd2">D/nd2</option><option value="nd1/nd1">nd1/nd1</option><option value="nd1/nd2">nd1/nd2</option><option value="nd2/nd2">nd2/nd2</option>
+</select></label>
+</div>
+</div>
+<div class="genetics-group">
+<h4>White Patterns</h4>
+<div class="form-grid">
+<label class="form-field"><span>Appaloosa (LP)</span>
+<select name="geneLP">
+<option value="">Not entered</option><option value="LP/LP">LP/LP</option><option value="LP/lp">LP/lp</option><option value="lp/lp">lp/lp</option>
+</select></label>
+<label class="form-field"><span>PATN1</span>
+<select name="genePATN1">
+<option value="">Not entered</option><option value="PATN1/PATN1">PATN1/PATN1</option><option value="PATN1/patn1">PATN1/patn1</option><option value="patn1/patn1">patn1/patn1</option>
+</select></label>
+<label class="form-field"><span>MITF (SW1)</span>
+<select name="geneMITF">
+<option value="">Not entered</option><option value="SW1/SW1">SW1/SW1</option><option value="SW1/n">SW1/n</option><option value="n/n">n/n</option>
+</select></label>
+<label class="form-field"><span>KIT (W20)</span>
+<select name="geneKIT">
+<option value="">Not entered</option><option value="W20/n">W20/n</option><option value="n/n">n/n</option>
+</select></label>
+</div>
+</div>
+
+<div class="coat-result-card">
+<div>
+<span class="coat-result-label">Coat Color</span>
+<strong id="calculated-coat-color">Enter genotype information to determine color</strong>
+<small id="coat-color-status">The result will update from the recorded genotype.</small>
+</div>
+<input type="hidden" name="color" id="actual-coat-color-input" value="">
+</div>
+
+<div class="profile-panel-heading">
+<div><h3>Genetic Potential (GP)</h3><p>Copy the complete Genetic Potential section from Horse Reality and paste it below.</p></div>
+</div>
+<label class="form-field paste-data-field">
+<span>Paste Genetic Potential (10 stats)</span>
+<textarea name="gpPaste" id="gp-paste-input" rows="12" placeholder="Acceleration&#10;52&#10;Agility&#10;66&#10;Balance&#10;52&#10;Bascule&#10;49&#10;Pulling power&#10;46&#10;Speed&#10;62&#10;Sprint&#10;55&#10;Stamina&#10;67&#10;Strength&#10;51&#10;Surefootedness&#10;68"></textarea>
+<small>VSM will identify each stat by name and save the ten individual values.</small>
+</label>
+
+<div class="profile-panel-heading">
+<div><h3>Conformation</h3><p>Copy the complete Conformation section from Horse Reality and paste it below.</p></div>
+</div>
+<label class="form-field paste-data-field">
+<span>Paste Conformation (12 traits)</span>
+<textarea name="conformationPaste" id="conformation-paste-input" rows="14" placeholder="Walk&#10;Average&#10;Trot&#10;Average&#10;Canter&#10;Below average&#10;Gallop&#10;Average&#10;Posture&#10;Average&#10;Head&#10;Average&#10;Neck&#10;Good&#10;Back&#10;Below average&#10;Shoulders&#10;Average&#10;Frontlegs&#10;Average&#10;Hindquarters&#10;Below average&#10;Socks&#10;Below average"></textarea>
+<small>VSM will identify each trait and convert its description into the corresponding conformation grade.</small>
+</label>
+
+<div class="profile-panel-heading">
+<div><h3>Health &amp; Soundness</h3><p>Record the horse's health and soundness ratings</p></div>
+</div>
+<div class="conformation-trait-grid health-stat-grid">
+<label class="form-field score-field"><span>Fertility</span><select name="fertility"><option value="">Not entered</option><option value="Excellent">Excellent</option><option value="Good">Good</option><option value="Average">Average</option><option value="Fair">Fair</option></select></label>
+<label class="form-field score-field"><span>Colic resistance</span><select name="colicResistance"><option value="">Not entered</option><option value="Excellent">Excellent</option><option value="Good">Good</option><option value="Average">Average</option><option value="Fair">Fair</option></select></label>
+<label class="form-field score-field"><span>Hoof quality</span><select name="hoofQuality"><option value="">Not entered</option><option value="Excellent">Excellent</option><option value="Good">Good</option><option value="Average">Average</option><option value="Fair">Fair</option></select></label>
+<label class="form-field score-field"><span>Back problems</span><select name="backProblems"><option value="">Not entered</option><option value="Excellent">Excellent</option><option value="Good">Good</option><option value="Average">Average</option><option value="Fair">Fair</option></select></label>
+<label class="form-field score-field"><span>Respiratory disease</span><select name="respiratoryDisease"><option value="">Not entered</option><option value="Excellent">Excellent</option><option value="Good">Good</option><option value="Average">Average</option><option value="Fair">Fair</option></select></label>
+<label class="form-field score-field"><span>Resistance to lameness</span><select name="lamenessResistance"><option value="">Not entered</option><option value="Excellent">Excellent</option><option value="Good">Good</option><option value="Average">Average</option><option value="Fair">Fair</option></select></label>
+</div>
+<label class="form-field breeders-advice-field">
+<span>Breeder's Advice</span>
+<textarea name="breedersAdvice" rows="8" placeholder="Paste the horse's complete Breeder's Advice from Horse Reality here..."></textarea>
+</label>
+<div class="form-actions">
+<button type="button" class="profile-back-button" data-back-to-registry>Cancel</button>
+<button type="submit" class="profile-preview-button" id="save-horse-button">Save Horse</button>
+</div>
+<p id="add-horse-message" role="status" aria-live="polite"></p>
+</form>
+</section>
+
+<!-- INDIVIDUAL HORSE PROFILE -->
+<section class="page horse-profile-page" id="profile-page">
+<div class="profile-back-row">
+<button class="profile-back-button" type="button" data-back-to-registry>← Back to Horse Registry</button>
+<span class="profile-preview-label">Individual Horse Record</span>
+</div>
+<div class="horse-profile-header">
+<div class="horse-profile-photo" aria-label="Horse photo placeholder"><span>♞</span><small>Horse image</small></div>
+<div class="horse-profile-heading">
+<p class="profile-eyebrow">HORSE PROFILE</p>
+<h2 id="profile-horse-name">Horse Name</h2>
+<div class="horse-profile-facts">
+<span><small>Breed</small><strong id="profile-breed">Not entered</strong></span>
+<span><small>Sex</small><strong id="profile-sex">Not entered</strong></span>
+<span><small>Age</small><strong id="profile-age">Not entered</strong></span>
+</div>
+<div class="profile-actions"><button type="button" class="profile-preview-button" id="edit-horse-button">Edit Horse</button></div>
+</div>
+</div>
+<div class="profile-tabs" role="tablist" aria-label="Horse profile sections">
+<button class="profile-tab active" type="button" role="tab" aria-selected="true" aria-controls="profile-info" data-profile-tab="info">Info</button>
+<button class="profile-tab" type="button" role="tab" aria-selected="false" aria-controls="profile-color" data-profile-tab="color">Color</button>
+<button class="profile-tab" type="button" role="tab" aria-selected="false" aria-controls="profile-gp-confo" data-profile-tab="gp-confo">GP &amp; Confo</button>
+<button class="profile-tab" type="button" role="tab" aria-selected="false" aria-controls="profile-health" data-profile-tab="health">Health</button>
+<button class="profile-tab" type="button" role="tab" aria-selected="false" aria-controls="profile-pedigree" data-profile-tab="pedigree">Pedigree</button>
+<button class="profile-tab" type="button" role="tab" aria-selected="false" aria-controls="profile-breeding" data-profile-tab="breeding">Breeding</button>
+<button class="profile-tab" type="button" role="tab" aria-selected="false" aria-controls="profile-offspring" data-profile-tab="offspring">Offspring</button>
+<button class="profile-tab" type="button" role="tab" aria-selected="false" aria-controls="profile-performance" data-profile-tab="performance">Performance</button>
+<button class="profile-tab" type="button" role="tab" aria-selected="false" aria-controls="profile-market" data-profile-tab="market">Market &amp; Value</button>
+<button class="profile-tab" type="button" role="tab" aria-selected="false" aria-controls="profile-history" data-profile-tab="history">Owner/Sale History</button>
+</div>
+
+<div class="profile-panel" id="profile-info" role="tabpanel" data-profile-panel="info">
+<div class="profile-panel-heading"><div><h3>Basic Information</h3><p>Horse Reality identity and core details</p></div></div>
+<div class="profile-detail-grid">
+<div class="profile-detail"><span>Registered Name</span><strong id="profile-info-name">Not entered</strong></div>
+<div class="profile-detail"><span>Horse Reality ID</span><strong id="profile-hr-id">Not entered</strong></div>
+<div class="profile-detail"><span>Breed</span><strong id="profile-info-breed">Not entered</strong></div>
+<div class="profile-detail"><span>Sex</span><strong id="profile-info-sex">Not entered</strong></div>
+<div class="profile-detail"><span>Date of Birth</span><strong id="profile-info-dob">Not entered</strong></div>
+<div class="profile-detail"><span>COI</span><strong id="profile-info-coi">Not entered</strong></div>
+</div>
+</div>
+
+<div class="profile-panel" id="profile-color" role="tabpanel" data-profile-panel="color" hidden>
+<div class="profile-panel-heading"><div><h3>Color &amp; Genetics</h3></div></div>
+<div class="coat-profile-result"><span>Coat Color</span><strong id="profile-color-value">Not entered</strong></div>
+<div class="genotype-profile-groups">
+<div class="genotype-profile-group">
+<h4>Colours &amp; Modifiers</h4>
+<div><span>Extension</span><strong id="profile-gene-extension">Not entered</strong></div>
+<div><span>Agouti</span><strong id="profile-gene-agouti">Not entered</strong></div>
+<div><span>Grey</span><strong id="profile-gene-grey">Not entered</strong></div>
+</div>
+<div class="genotype-profile-group">
+<h4>Dilutions</h4>
+<div><span>Cream / Pearl</span><strong id="profile-gene-cream-pearl">Not entered</strong></div>
+<div><span>Dun</span><strong id="profile-gene-dun">Not entered</strong></div>
+</div>
+<div class="genotype-profile-group">
+<h4>White Patterns</h4>
+<div><span>Appaloosa (LP)</span><strong id="profile-gene-lp">Not entered</strong></div>
+<div><span>PATN1</span><strong id="profile-gene-patn1">Not entered</strong></div>
+<div><span>MITF (SW1)</span><strong id="profile-gene-mitf">Not entered</strong></div>
+<div><span>KIT (W20)</span><strong id="profile-gene-kit">Not entered</strong></div>
+</div>
+</div>
+</div>
+
+<div class="profile-panel" id="profile-gp-confo" role="tabpanel" data-profile-panel="gp-confo" hidden>
+<div class="profile-panel-heading"><div><h3>GP &amp; Conformation</h3><p>Individual genetic potential stats and conformation trait grades</p></div></div>
+<div class="genotype-profile-groups gp-conformation-profile-groups">
+<div class="genotype-profile-group">
+<h4>Genetic Potential (GP)</h4>
+<div class="coat-profile-result profile-calculated-total"><span>Total GP</span><strong id="profile-gp-total">Not calculated</strong></div>
+<div class="gp-stat-grid profile-stat-grid">
+<div><span>Acceleration</span><strong id="profile-gp-acceleration">Not entered</strong></div>
+<div><span>Bascule</span><strong id="profile-gp-bascule">Not entered</strong></div>
+<div><span>Sprint</span><strong id="profile-gp-sprint">Not entered</strong></div>
+<div><span>Surefootedness</span><strong id="profile-gp-surefootedness">Not entered</strong></div>
+<div><span>Agility</span><strong id="profile-gp-agility">Not entered</strong></div>
+<div><span>Pulling Power</span><strong id="profile-gp-pulling-power">Not entered</strong></div>
+<div><span>Stamina</span><strong id="profile-gp-stamina">Not entered</strong></div>
+<div><span>Balance</span><strong id="profile-gp-balance">Not entered</strong></div>
+<div><span>Speed</span><strong id="profile-gp-speed">Not entered</strong></div>
+<div><span>Strength</span><strong id="profile-gp-strength">Not entered</strong></div>
+</div>
+</div>
+<div class="genotype-profile-group">
+<h4>Conformation</h4>
+<div class="coat-profile-result profile-calculated-total">
+    <span>Conformation Breakdown — 12 Traits</span>
+    <strong id="profile-confo-summary">Not calculated</strong>
+</div>
+
+<div class="conformation-grade-breakdown">
+    <div><span>VG</span><strong id="profile-confo-vg">0</strong></div>
+    <div class="gplus-grade"><span>G+</span><strong id="profile-confo-gplus">0</strong></div>
+    <div><span>G</span><strong id="profile-confo-g">0</strong></div>
+    <div><span>A</span><strong id="profile-confo-a">0</strong></div>
+    <div><span>BA</span><strong id="profile-confo-ba">0</strong></div>
+    <div><span>P</span><strong id="profile-confo-p">0</strong></div>
+</div>
+
+<div class="conformation-gplus-panel">
+    <h5>G+ Traits</h5>
+    <div id="profile-confo-gplus-list">No G+ traits recorded</div>
+</div>
+<div class="conformation-trait-grid profile-stat-grid">
+<div><span>Walk</span><strong id="profile-confo-walk">Not entered</strong></div>
+<div><span>Trot</span><strong id="profile-confo-trot">Not entered</strong></div>
+<div><span>Canter</span><strong id="profile-confo-canter">Not entered</strong></div>
+<div><span>Gallop</span><strong id="profile-confo-gallop">Not entered</strong></div>
+<div><span>Posture</span><strong id="profile-confo-posture">Not entered</strong></div>
+<div><span>Head</span><strong id="profile-confo-head">Not entered</strong></div>
+<div><span>Neck</span><strong id="profile-confo-neck">Not entered</strong></div>
+<div><span>Back</span><strong id="profile-confo-back">Not entered</strong></div>
+<div><span>Shoulders</span><strong id="profile-confo-shoulders">Not entered</strong></div>
+<div><span>Forelegs</span><strong id="profile-confo-forelegs">Not entered</strong></div>
+<div><span>Hindquarters</span><strong id="profile-confo-hindquarters">Not entered</strong></div>
+<div><span>Socks</span><strong id="profile-confo-socks">Not entered</strong></div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="profile-panel" id="profile-health" role="tabpanel" data-profile-panel="health" hidden>
+<div class="profile-panel-heading"><div><h3>Health &amp; Soundness</h3><p>Recorded health and soundness ratings</p></div></div>
+<div class="profile-detail-grid">
+<div class="profile-detail"><span>Fertility</span><strong id="profile-health-fertility">Not entered</strong></div>
+<div class="profile-detail"><span>Colic resistance</span><strong id="profile-health-colic-resistance">Not entered</strong></div>
+<div class="profile-detail"><span>Hoof quality</span><strong id="profile-health-hoof-quality">Not entered</strong></div>
+<div class="profile-detail"><span>Back problems</span><strong id="profile-health-back-problems">Not entered</strong></div>
+<div class="profile-detail"><span>Respiratory disease</span><strong id="profile-health-respiratory-disease">Not entered</strong></div>
+<div class="profile-detail"><span>Resistance to lameness</span><strong id="profile-health-lameness-resistance">Not entered</strong></div>
+</div>
+</div>
+
+<div class="profile-panel" id="profile-pedigree" role="tabpanel" data-profile-panel="pedigree" hidden>
+<div class="profile-panel-heading"><div><h3>Pedigree</h3><p>Parents, ancestors, and extended bloodlines</p></div></div>
+<div class="profile-empty-content">Pedigree records will appear here when available.</div>
+</div>
+<div class="profile-panel" id="profile-breeding" role="tabpanel" data-profile-panel="breeding" hidden>
+<div class="profile-panel-heading"><div><h3>Breeding Records</h3><p>Breeding history and recorded pairings</p></div></div>
+<div class="profile-empty-content">Breeding records will appear here when available.</div>
+</div>
+<div class="profile-panel" id="profile-offspring" role="tabpanel" data-profile-panel="offspring" hidden>
+<div class="profile-panel-heading"><div><h3>Offspring</h3><p>Foals linked to this horse and their other parent</p></div></div>
+<div class="profile-empty-content">Offspring records will appear here when available.</div>
+</div>
+<div class="profile-panel" id="profile-performance" role="tabpanel" data-profile-panel="performance" hidden>
+    <div class="profile-panel-heading">
+        <div>
+            <h3>Performance &amp; Achievements</h3>
+            <p>Track conformation shows, competition results, and lifetime earnings</p>
+        </div>
+    </div>
+
+    <div class="profile-detail-grid">
+        <div class="profile-detail">
+            <span>Conformation Shows</span>
+            <strong id="profile-conformation-show-count">0</strong>
+        </div>
+        <div class="profile-detail">
+            <span>Competition Shows</span>
+            <strong id="profile-competition-show-count">0</strong>
+        </div>
+        <div class="profile-detail">
+            <span>Lifetime Earnings (LTE)</span>
+            <strong id="profile-lifetime-earnings">Not entered</strong>
+        </div>
+    </div>
+
+    <section class="panel performance-record-panel">
+        <div class="panel-heading">
+            <div>
+                <h3>Conformation Shows</h3>
+                <p>Record conformation show placements and achievements</p>
+            </div>
+            <button type="button" class="profile-preview-button" id="add-conformation-show-button">
+                + Add Conformation Show
+            </button>
+        </div>
+
+        <div id="conformation-show-form-container" hidden></div>
+        <div id="conformation-show-records" class="performance-record-list">
+            <div class="profile-empty-content">No conformation show records have been added.</div>
+        </div>
+    </section>
+
+    <section class="panel performance-record-panel">
+        <div class="panel-heading">
+            <div>
+                <h3>Competition Shows</h3>
+                <p>Record discipline, competition results, and earnings</p>
+            </div>
+            <button type="button" class="profile-preview-button" id="add-competition-show-button">
+                + Add Competition Show
+            </button>
+        </div>
+
+        <div id="competition-show-form-container" hidden></div>
+        <div id="competition-show-records" class="performance-record-list">
+            <div class="profile-empty-content">No competition show records have been added.</div>
+        </div>
+    </section>
+
+    <p id="profile-performance-message" role="status" aria-live="polite"></p>
+</div>
+
+<div class="profile-panel" id="profile-market" role="tabpanel" data-profile-panel="market" hidden>
+    <div class="profile-panel-heading">
+        <div>
+            <h3>Market &amp; Value</h3>
+            <p>Suggested pricing based on the horse's recorded information</p>
+        </div>
+    </div>
+
+    <div class="profile-detail-grid">
+        <div class="profile-detail">
+            <span>Suggested Starting Bid</span>
+            <strong id="profile-suggested-starting-bid">Not calculated</strong>
+        </div>
+        <div class="profile-detail">
+            <span>Suggested Buyout Price</span>
+            <strong id="profile-suggested-buyout-price">Not calculated</strong>
+        </div>
+        <div class="profile-detail">
+            <span>Suggested Stud Fee</span>
+            <strong id="profile-suggested-stud-fee">Not calculated</strong>
+        </div>
+    </div>
+
+    <div class="market-note">
+        <strong>Pricing estimate</strong>
+        <p>
+            These values are suggested estimates, not automatic sale listings.
+            Review the horse's overall quality, conformation, performance,
+            genetics, health, age, and breeding record when deciding on a final price.
+        </p>
+    </div>
+
+    <div class="profile-detail-grid">
+        <div class="profile-detail">
+            <span>Recorded GP</span>
+            <strong id="profile-market-gp">Not entered</strong>
+        </div>
+        <div class="profile-detail">
+            <span>Conformation</span>
+            <strong id="profile-market-conformation">Not entered</strong>
+        </div>
+        <div class="profile-detail">
+            <span>Show Record</span>
+            <strong id="profile-market-show-record">Not entered</strong>
+        </div>
+        <div class="profile-detail">
+            <span>Competition Record</span>
+            <strong id="profile-market-competition-record">Not entered</strong>
+        </div>
+        <div class="profile-detail">
+            <span>Offspring Record</span>
+            <strong id="profile-market-offspring-record">Not entered</strong>
+        </div>
+        <div class="profile-detail">
+            <span>Breeding Value</span>
+            <strong id="profile-market-breeding-value">Not entered</strong>
+        </div>
+    </div>
+
+    <p id="profile-market-message" role="status" aria-live="polite"></p>
+</div>
+
+<div class="profile-panel" id="profile-history" role="tabpanel" data-profile-panel="history" hidden>
+    <div class="profile-panel-heading">
+        <div>
+            <h3>Owner &amp; Sale History</h3>
+            <p>Previous owners, transfers, and sale records</p>
+        </div>
+    </div>
+    <div class="profile-empty-content">
+        Ownership and sale history will appear here when available.
+    </div>
+</div>
+</section>
+
+<!-- PLACEHOLDER PAGES -->
+<section class="page placeholder-page" id="pedigree-page">
+    <div class="placeholder-panel">
+        <span>◇</span>
+        <h2>Pedigree &amp; Genetics</h2>
+        <p>Pedigrees, bloodlines, genetics, and COI management will be developed here.</p>
+        <small>Section layout pending</small>
+    </div>
+</section>
+
+<section class="page placeholder-page" id="breeding-page">
+    <div class="placeholder-panel">
+        <span>♡</span>
+        <h2>Breeding Management</h2>
+        <p>Manage breeding plans, mare records, stallions, and breeding histories.</p>
+        <small>Section layout pending</small>
+    </div>
+</section>
+
+<section class="page placeholder-page" id="offspring-page">
+    <div class="placeholder-panel">
+        <span>♧</span>
+        <h2>Offspring Records</h2>
+        <p>Explore foal records and connected parent and offspring histories.</p>
+        <small>Section layout pending</small>
+    </div>
+</section>
+
+<section class="page placeholder-page" id="performance-page">
+    <div class="placeholder-panel">
+        <span>✧</span>
+        <h2>Performance</h2>
+        <p>Training, competitions, show records, and achievements will be organized here.</p>
+        <small>Section layout pending</small>
+    </div>
+</section>
+
+<!-- MARKET & PRICING -->
+<section class="page market-page" id="market-page">
+    <div class="registry-intro market-intro">
+        <div>
+            <h2>Market &amp; Pricing</h2>
+            <p>
+                Market references and pricing guidance for the breeds in your stable,
+                expressed in Horse Reality Credits (HRC).
+            </p>
+        </div>
+    </div>
+
+    <div class="market-section-heading">
+        <div>
+            <h3>Market Overview</h3>
+            <p>
+                Lowest and highest suggested Buyout Prices and Stud Fees for each breed,
+                based on the values available in your stable.
+            </p>
+        </div>
+    </div>
+
+    <div class="market-breed-overview-grid" id="market-overview-by-breed">
+        <div class="profile-empty-content">
+            Breed market summaries will appear here when horse records are available.
+        </div>
+    </div>
+
+    <div class="market-section-heading">
+        <div>
+            <h3>Background Market References</h3>
+            <p>
+                Informational price ranges only. These are not automatic valuations
+                and are not assigned to individual horses.
+            </p>
+        </div>
+        <span class="market-breed-tag">APPALOOSA</span>
+    </div>
+
+    <div class="market-benchmark-grid">
+        <article class="market-benchmark-card">
+            <span class="market-card-kicker">LOWER-END MARKET</span>
+            <h4>Companion &amp; Project Horses</h4>
+            <strong>500–2,500 <small>HRC</small></strong>
+            <p>Older stock, companions, and green projects.</p>
+        </article>
+
+        <article class="market-benchmark-card">
+            <span class="market-card-kicker">YOUNG STOCK</span>
+            <h4>Weanlings &amp; Yearlings</h4>
+            <strong>2,000–10,000 <small>HRC</small></strong>
+            <p>Unstarted young horses, with value shaped by quality and bloodlines.</p>
+        </article>
+
+        <article class="market-benchmark-card">
+            <span class="market-card-kicker">RIDING MARKET</span>
+            <h4>Trail &amp; Pleasure Horses</h4>
+            <strong>3,500–16,500 <small>HRC</small></strong>
+            <p>Started or experienced riding horses, generally ages 3 to 15+.</p>
+        </article>
+
+        <article class="market-benchmark-card">
+            <span class="market-card-kicker">PERFORMANCE MARKET</span>
+            <h4>Show &amp; Specialized Horses</h4>
+            <strong>15,000–45,000+ <small>HRC</small></strong>
+            <p>Competitive horses, specialized disciplines, and quality broodmares.</p>
+        </article>
+    </div>
+
+    <div class="market-content-grid">
+        <section class="panel market-panel">
+            <div class="panel-heading">
+                <div>
+                    <h3>Appaloosa Stud Fee Benchmarks</h3>
+                    <p>The same evaluated fee applies to live cover and each semen vial.</p>
+                </div>
+            </div>
+
+            <div class="market-fee-list">
+                <div class="market-fee-row">
+                    <div>
+                        <strong>Entry-Level &amp; Foundation</strong>
+                        <small>Younger prospects and regional foundation stallions</small>
+                    </div>
+                    <strong>400–750 HRC</strong>
+                </div>
+
+                <div class="market-fee-row">
+                    <div>
+                        <strong>Standard Show &amp; Proven</strong>
+                        <small>Established stallions with show records or proven breeding value</small>
+                    </div>
+                    <strong>850–1,200 HRC</strong>
+                </div>
+
+                <div class="market-fee-row">
+                    <div>
+                        <strong>Elite &amp; Futurity</strong>
+                        <small>Elite money-earners, high-level performers, and standout sires</small>
+                    </div>
+                    <strong>1,500+ HRC</strong>
+                </div>
+            </div>
+
+            <div class="market-note">
+                <strong>Vial pricing rule</strong>
+                <p>
+                    Each semen vial uses the stallion's evaluated stud fee—the same
+                    price as live cover. The 200 HRC collection cost is tracked
+                    separately as an expense when calculating vial profitability.
+                </p>
+            </div>
+        </section>
+
+        <section class="panel market-panel">
+            <div class="panel-heading">
+                <div>
+                    <h3>Pricing Reference Factors</h3>
+                    <p>
+                        Considerations used when evaluating an individual horse's
+                        overall market and breeding value.
+                    </p>
+                </div>
+            </div>
+
+            <ul class="market-factor-list">
+                <li>
+                    <strong>Genetic Potential &amp; Conformation</strong>
+                    <span>Overall quality and suitability for the horse's intended discipline.</span>
+                </li>
+                <li>
+                    <strong>Training &amp; Performance</strong>
+                    <span>Level of training, competition history, results, and earnings.</span>
+                </li>
+                <li>
+                    <strong>Bloodlines &amp; Genetics</strong>
+                    <span>Pedigree, useful inherited traits, and breeding relevance.</span>
+                </li>
+                <li>
+                    <strong>Offspring Record</strong>
+                    <span>Quality and proven performance of offspring, where applicable.</span>
+                </li>
+                <li>
+                    <strong>Health, Fertility, Age &amp; COI</strong>
+                    <span>Soundness, reproductive value, age, and responsible breeding considerations.</span>
+                </li>
+                <li>
+                    <strong>Marketability</strong>
+                    <span>Demand for the horse's qualities and intended use.</span>
+                </li>
+            </ul>
+        </section>
+    </div>
+
+    <section class="panel market-panel market-principles-panel">
+        <div class="panel-heading">
+            <div>
+                <h3>Market &amp; Pricing Notes</h3>
+                <p>How pricing estimates are intended to be used in VSM</p>
+            </div>
+        </div>
+
+        <div class="market-principles-grid">
+            <div>
+                <strong>Suggested pricing</strong>
+                <p>
+                    VSM uses available horse information to help estimate reasonable
+                    pricing. Suggestions are not guaranteed sale values.
+                </p>
+            </div>
+            <div>
+                <strong>Starting Bid</strong>
+                <p>
+                    A suggested minimum opening bid based on the horse's overall value.
+                </p>
+            </div>
+            <div>
+                <strong>Buyout Price</strong>
+                <p>
+                    A suggested price representing the horse's estimated full market worth.
+                </p>
+            </div>
+            <div>
+                <strong>Stud Fee</strong>
+                <p>
+                    A suggested breeding fee based on the stallion's overall breeding
+                    value, not GP alone.
+                </p>
+            </div>
+        </div>
+    </section>
+</section>
+
+<section class="page placeholder-page" id="statistics-page">
+    <div class="placeholder-panel">
+        <span>▥</span>
+        <h2>Statistics</h2>
+        <p>Explore your stable, breeding, genetics, and performance statistics.</p>
+        <small>Section layout pending</small>
+    </div>
+</section>
+
+<section class="page placeholder-page" id="settings-page">
+    <div class="placeholder-panel">
+        <span>⚙</span>
+        <h2>Settings</h2>
+        <p>Application preferences, data protection, and backup settings will be organized here.</p>
+        <small>Section layout pending</small>
+    </div>
+</section>
+
+</main>
+</div>
+
+<script src="genetics.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
